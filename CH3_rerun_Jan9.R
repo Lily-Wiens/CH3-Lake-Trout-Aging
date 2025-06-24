@@ -906,7 +906,7 @@ final_plot <- p + geom_text(data = formulas, aes(x = Inf, y = Inf, label = formu
 ggsave("log_mass_vs_log_length_plot.png", plot = final_plot, width = 10, height = 8, dpi = 300)
 print(final_plot)
 
-#### stabdard mass vs fl and lake ####
+#### standard mass vs fl and lake ####
 
 # Fit linear models for each lake and extract formulas
 formulasstm <- OD_sheet %>%
@@ -2008,11 +2008,7 @@ ggplot(fish_data, aes(x = age, y = fork_length, color = locality)) +
       y = "Fork Length (mm)",
       color = "Locality")
                             
-# try again
-                            
 
-# did not worked
-# again
                             
 # Scale your data
 fish_data <- OD_sheet
@@ -2020,18 +2016,17 @@ fish_data$scaled_age <- scale(fish_data$Age)
 fish_data$scaled_fork_length <- scale(fish_data$fork_length)
                             
 # Fit the von Bertalanffy growth function with scaled data and higher evaluation limits
-                            vbgf_model <- nls(scaled_fork_length ~ L_inf * (1 - exp(-k * (scaled_age - t_0))), 
-                                              data = fish_data, 
-                                              start = list(L_inf = 1, k = 0.1, t_0 = 0),
-                                              algorithm = "port",
-                                              control = nls.control(maxiter = 500, maxeval = 1000))
+vbgf_model <- nls(scaled_fork_length ~ L_inf * (1 - exp(-k * (scaled_age - t_0))), 
+                  data = fish_data, 
+                  start = list(L_inf = 1, k = 0.1, t_0 = 0),
+                  algorithm = "port",
+                  control = nls.control(maxiter = 500, maxeval = 1000)
+# Add predicted values to the data frame and scale back
+fish_data$predicted_scaled_fork_length <- predict(vbgf_model)
+fish_data$predicted_fork_length <- (fish_data$predicted_scaled_fork_length * sd(fish_data$fork_length)) + mean(fish_data$fork_length)
                             
-                            # Add predicted values to the data frame and scale back
-                            fish_data$predicted_scaled_fork_length <- predict(vbgf_model)
-                            fish_data$predicted_fork_length <- (fish_data$predicted_scaled_fork_length * sd(fish_data$fork_length)) + mean(fish_data$fork_length)
-                            
-                            # Plot with the von Bertalanffy growth curve
-                            ggplot(fish_data, aes(x = age, y = fork_length, color = locality)) + 
+ # Plot with the von Bertalanffy growth curve
+ ggplot(fish_data, aes(x = age, y = fork_length, color = locality)) + 
                               geom_point(size = 3) + 
                               geom_line(aes(y = predicted_fork_length), color = "black") +  # VBGF curve
                               theme_classic() +
@@ -2385,35 +2380,35 @@ stargazer(lm_model_fl_age_lake, type = "text",
                                       covariate.labels = c("Age"),
                                       out = "linear_model_results.txt")
                             
-                            # Linear Regression Results
-                            # ===============================================
-                            #   Dependent variable:    
-                            #   ---------------------------
-                            #   Fork Length        
-                            # -----------------------------------------------
-                            #   Age                          6.374***          
-                            #   (1.289)          
-                            # 
-                            # lakeLOTR                    -118.337***        
-                            #   (20.240)          
-                            # 
-                            # lakeOpeongo                    2.129           
-                            # (17.440)          
-                            # 
-                            # lakeShirley                 -153.839***        
-                            #   (16.894)          
-                            # 
-                            # Constant                    457.981***         
-                            #   (22.357)          
-                            # 
-                            # -----------------------------------------------
-                            #   Observations                    46             
-                            # R2                             0.831           
-                            # Adjusted R2                    0.814           
-                            # Residual Std. Error      41.678 (df = 41)      
-                            # F Statistic           50.382*** (df = 4; 41)   
-                            # ===============================================
-                            #   Note:               *p<0.1; **p<0.05; ***p<0.01
+# Linear Regression Results
+# ===============================================
+#   Dependent variable:    
+#   ---------------------------
+#   Fork Length        
+# -----------------------------------------------
+#   Age                          6.374***          
+#   (1.289)          
+# 
+# lakeLOTR                    -118.337***        
+#   (20.240)          
+# 
+# lakeOpeongo                    2.129           
+# (17.440)          
+# 
+# lakeShirley                 -153.839***        
+#   (16.894)          
+# 
+# Constant                    457.981***         
+#   (22.357)          
+# 
+# -----------------------------------------------
+#   Observations                    46             
+# R2                             0.831           
+# Adjusted R2                    0.814           
+# Residual Std. Error      41.678 (df = 41)      
+# F Statistic           50.382*** (df = 4; 41)   
+# ===============================================
+#   Note:               *p<0.1; **p<0.05; ***p<0.01
                             
                             
                             
@@ -2604,12 +2599,12 @@ vjust = 2, size = 4, color = "black")
                             
 annotate("text", x = Inf, y = Inf, label = formula_text, hjust = 0.8, vjust = 2, size = 5, color = "black")
                             
-                            # Save the specific plot object 
-                            myplot_fl_age <- ggplot(OD_sheet, aes(x = Age, y = fork_length, color = lake)) + 
-                              geom_point(size = 3) + 
-                              geom_smooth(method = "lm", formula = y ~ log(x), se = FALSE, color = "green") +  # Logarithmic curve
-                              theme_classic() +
-                              labs(title = "Scatterplot of Fork Length vs. Age with Logarithmic Fit",
+ # Save the specific plot object 
+ myplot_fl_age <- ggplot(OD_sheet, aes(x = Age, y = fork_length, color = lake)) + 
+ geom_point(size = 3) + 
+  geom_smooth(method = "lm", formula = y ~ log(x), se = FALSE, color = "green") +  # Logarithmic curve
+                   theme_classic() +
+                  labs(title = "Scatterplot of Fork Length vs. Age with Logarithmic Fit",
                                    x = "Age (years)",
                                    y = "Fork Length (mm)",
                                    color = "Lake") +
@@ -2621,9 +2616,9 @@ annotate("text", x = Inf, y = Inf, label = formula_text, hjust = 0.8, vjust = 2,
                                    width = 6, height = 4, dpi = 300)
                             
                             
-                            # Save the specific plot object with a proper file extension
-                            ggsave("myplot_fl_age.png", 
-                                   plot = myplot_fl_age, width = 6, height = 4, dpi = 300)
+   # Save the specific plot object with a proper file extension
+  ggsave("myplot_fl_age.png", 
+                 plot = myplot_fl_age, width = 6, height = 4, dpi = 300)
                             
                             
 #### anova length ####
@@ -2715,132 +2710,131 @@ TukeyHSD(anova_age)
                             
 anova_lmass <- aov(liver_mass ~ lake, data = OD_sheet)
 summary(anova_lmass)
-                            # Df Sum Sq Mean Sq F value   Pr(>F)    
-                            # lake         3   4538  1512.6   32.97 7.29e-13 ***
-                            #   Residuals   62   2845    45.9                     
-                            # ---
-                            #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-                            TukeyHSD(anova_lmass)
-                            # Tukey multiple comparisons of means
-                            # 95% family-wise confidence level
-                            # 
-                            # Fit: aov(formula = liver_mass ~ lake, data = OD_sheet)
-                            # 
-                            # $lake
-                            # diff        lwr        upr     p adj
-                            # LOTR-Hogan      -16.658647 -22.792626 -10.524668 0.0000000
-                            # Opeongo-Hogan    -1.478713  -7.707799   4.750372 0.9230915
-                            # Shirley-Hogan   -17.869338 -24.098424 -11.640253 0.0000000
-                            # Opeongo-LOTR     15.179934   8.950848  21.409019 0.0000001
-                            # Shirley-LOTR     -1.210691  -7.439777   5.018394 0.9556576
-                            # Shirley-Opeongo -16.390625 -22.713386 -10.067864 0.0000000
+  # Df Sum Sq Mean Sq F value   Pr(>F)    
+# lake         3   4538  1512.6   32.97 7.29e-13 ***
+#   Residuals   62   2845    45.9                     
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+TukeyHSD(anova_lmass)
+# Tukey multiple comparisons of means
+# 95% family-wise confidence level
+# 
+# Fit: aov(formula = liver_mass ~ lake, data = OD_sheet)
+# 
+# $lake
+# diff        lwr        upr     p adj
+# LOTR-Hogan      -16.658647 -22.792626 -10.524668 0.0000000
+# Opeongo-Hogan    -1.478713  -7.707799   4.750372 0.9230915
+# Shirley-Hogan   -17.869338 -24.098424 -11.640253 0.0000000
+# Opeongo-LOTR     15.179934   8.950848  21.409019 0.0000001
+# Shirley-LOTR     -1.210691  -7.439777   5.018394 0.9556576
+# Shirley-Opeongo -16.390625 -22.713386 -10.067864 0.0000000
                             
-                            anova_gmass <- aov(gonad_mass ~ lake, data = OD_sheet)
-                            summary(anova_gmass)
-                            # Df Sum Sq Mean Sq F value   Pr(>F)    
-                            # lake         3 164058   54686   9.142 4.27e-05 ***
-                            #   Residuals   62 370884    5982                     
-                            # ---
-                            #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-                            TukeyHSD(anova_gmass)
-                            # Tukey multiple comparisons of means
-                            # 95% family-wise confidence level
-                            # 
-                            # Fit: aov(formula = gonad_mass ~ lake, data = OD_sheet)
-                            # 
-                            # $lake
-                            # diff         lwr       upr     p adj
-                            # LOTR-Hogan      -107.068529 -177.106696 -37.03036 0.0008556
-                            # Opeongo-Hogan    -30.573360 -101.697455  40.55073 0.6695630
-                            # Shirley-Hogan   -117.057485 -188.181580 -45.93339 0.0003009
-                            # Opeongo-LOTR      76.495169    5.371075 147.61926 0.0302810
-                            # Shirley-LOTR      -9.988956  -81.113050  61.13514 0.9824385
-                            # Shirley-Opeongo  -86.484125 -158.677815 -14.29044 0.0126147
+anova_gmass <- aov(gonad_mass ~ lake, data = OD_sheet)
+summary(anova_gmass)
+# Df Sum Sq Mean Sq F value   Pr(>F)    
+# lake         3 164058   54686   9.142 4.27e-05 ***
+#   Residuals   62 370884    5982                     
+# ---
+ #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+TukeyHSD(anova_gmass)
+# Tukey multiple comparisons of means
+ # 95% family-wise confidence level
+# 
+ # Fit: aov(formula = gonad_mass ~ lake, data = OD_sheet)
+  # 
+ # $lake
+# diff         lwr       upr     p adj
+# LOTR-Hogan      -107.068529 -177.106696 -37.03036 0.0008556
+# Opeongo-Hogan    -30.573360 -101.697455  40.55073 0.6695630
+# Shirley-Hogan   -117.057485 -188.181580 -45.93339 0.0003009
+# Opeongo-LOTR      76.495169    5.371075 147.61926 0.0302810
+# Shirley-LOTR      -9.988956  -81.113050  61.13514 0.9824385
+# Shirley-Opeongo  -86.484125 -158.677815 -14.29044 0.0126147
+anova_vmass <- aov(ventricle_mass ~ lake, data = OD_sheet)
+summary(anova_vmass)
+# Df Sum Sq Mean Sq F value   Pr(>F)    
+# lake         3  20.96   6.987   31.93 1.33e-12 ***
+#   Residuals   62  13.57   0.219                     
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+TukeyHSD(anova_vmass)
+# Tukey multiple comparisons of means
+ # 95% family-wise confidence level
+# 
+# Fit: aov(formula = ventricle_mass ~ lake, data = OD_sheet)
+# 
+ # $lake
+ # diff        lwr        upr     p adj
+  # LOTR-Hogan      -1.01294118 -1.4365785 -0.5893038 0.0000002
+# Opeongo-Hogan    0.17029412 -0.2599116  0.6004999 0.7237411
+# Shirley-Hogan   -1.06370588 -1.4939116 -0.6335001 0.0000001
+ # Opeongo-LOTR     1.18323529  0.7530295  1.6134411 0.0000000
+# Shirley-LOTR    -0.05076471 -0.4809705  0.3794411 0.9894189
+# Shirley-Opeongo -1.23400000 -1.6706754 -0.7973246 0.0000000
                             
-                            anova_vmass <- aov(ventricle_mass ~ lake, data = OD_sheet)
-                            summary(anova_vmass)
-                            # Df Sum Sq Mean Sq F value   Pr(>F)    
-                            # lake         3  20.96   6.987   31.93 1.33e-12 ***
-                            #   Residuals   62  13.57   0.219                     
-                            # ---
-                            #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-                            TukeyHSD(anova_vmass)
-                            # Tukey multiple comparisons of means
-                            # 95% family-wise confidence level
-                            # 
-                            # Fit: aov(formula = ventricle_mass ~ lake, data = OD_sheet)
-                            # 
-                            # $lake
-                            # diff        lwr        upr     p adj
-                            # LOTR-Hogan      -1.01294118 -1.4365785 -0.5893038 0.0000002
-                            # Opeongo-Hogan    0.17029412 -0.2599116  0.6004999 0.7237411
-                            # Shirley-Hogan   -1.06370588 -1.4939116 -0.6335001 0.0000001
-                            # Opeongo-LOTR     1.18323529  0.7530295  1.6134411 0.0000000
-                            # Shirley-LOTR    -0.05076471 -0.4809705  0.3794411 0.9894189
-                            # Shirley-Opeongo -1.23400000 -1.6706754 -0.7973246 0.0000000
-                            
-                            library(broom)
-                            lm_length <- aov(fork_length ~ lake, data = OD_sheet)
-                            summary(lm_length)
-                            # Df Sum Sq Mean Sq F value Pr(>F)    
-                            # lake         3 385390  128463   50.88 <2e-16 ***
-                            #   Residuals   62 156530    2525                   
-                            # ---
-                            #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-                            # Generate a tidy summary of the linear model
-                            forest_model(lm_length)
-                            plot(lm_length)
-                            anova(lm_length)
-                            # Analysis of Variance Table
-                            # 
-                            # Response: fork_length
-                            # Df Sum Sq Mean Sq F value    Pr(>F)    
-                            # lake       3 385390  128463  50.883 < 2.2e-16 ***
-                            #   Residuals 62 156530    2525                      
-                            # ---
-                            #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-                            
-                            
-                            anova_mass_post <- aov(mass_post_resp_g ~ lake, data = OD_sheet)
-                            summary(anova_mass_post)
-                            # Df   Sum Sq Mean Sq F value   Pr(>F)    
-                            # lake         3 24431871 8143957   40.36 1.38e-14 ***
-                            #   Residuals   62 12510581  201784                     
-                            # ---
-                            #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-                            
-                            TukeyHSD(anova_mass_post)
-                            # Tukey multiple comparisons of means
-                            # 95% family-wise confidence level
-                            # 
-                            # Fit: aov(formula = mass_post_resp_g ~ lake, data = OD_sheet)
-                            # 
-                            # $lake
-                            # diff        lwr       upr     p adj
-                            # LOTR-Hogan      -1225.82353 -1632.5986 -819.0485 0.0000000
-                            # Opeongo-Hogan    -128.00000  -541.0820  285.0820 0.8457039
-                            # Shirley-Hogan   -1324.25000 -1737.3320 -911.1680 0.0000000
-                            # Opeongo-LOTR     1097.82353   684.7415 1510.9055 0.0000000
-                            # Shirley-LOTR      -98.42647  -511.5085  314.6555 0.9223144
-                            # Shirley-Opeongo -1196.25000 -1615.5441 -776.9559 0.0000000
+library(broom)
+lm_length <- aov(fork_length ~ lake, data = OD_sheet)
+summary(lm_length)
+ # Df Sum Sq Mean Sq F value Pr(>F)    
+# lake         3 385390  128463   50.88 <2e-16 ***
+#   Residuals   62 156530    2525                   
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Generate a tidy summary of the linear model
+forest_model(lm_length)
+plot(lm_length)
+anova(lm_length)
+# Analysis of Variance Table
+# 
+# Response: fork_length
+ # Df Sum Sq Mean Sq F value    Pr(>F)    
+# lake       3 385390  128463  50.883 < 2.2e-16 ***
+#   Residuals 62 156530    2525                      
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
                             
                             
+anova_mass_post <- aov(mass_post_resp_g ~ lake, data = OD_sheet)
+summary(anova_mass_post)
+# Df   Sum Sq Mean Sq F value   Pr(>F)    
+ # lake         3 24431871 8143957   40.36 1.38e-14 ***
+#   Residuals   62 12510581  201784                     
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
                             
-                            # Perform correlation test
-                            result_mass <- cor.test(OD_sheet$standard_mass, OD_sheet$mass_post_resp_g)
+TukeyHSD(anova_mass_post)
+# Tukey multiple comparisons of means
+# 95% family-wise confidence level
+# 
+ # Fit: aov(formula = mass_post_resp_g ~ lake, data = OD_sheet)
+# 
+# $lake
+# diff        lwr       upr     p adj
+# LOTR-Hogan      -1225.82353 -1632.5986 -819.0485 0.0000000
+ # Opeongo-Hogan    -128.00000  -541.0820  285.0820 0.8457039
+# Shirley-Hogan   -1324.25000 -1737.3320 -911.1680 0.0000000
+# Opeongo-LOTR     1097.82353   684.7415 1510.9055 0.0000000
+# Shirley-LOTR      -98.42647  -511.5085  314.6555 0.9223144
+# Shirley-Opeongo -1196.25000 -1615.5441 -776.9559 0.0000000
                             
-                            # Print the result
-                            print(result_mass)
-                            # Pearson's product-moment correlation
-                            # 
-                            # data:  OD_sheet$standard_mass and OD_sheet$mass_post_resp_g
-                            # t = 87.914, df = 64, p-value < 2.2e-16
-                            # alternative hypothesis: true correlation is not equal to 0
-                            # 95 percent confidence interval:
-                            #  0.9932662 0.9974869
-                            # sample estimates:
-                            #       cor 
-                            # 0.9958852 
+                            
+                            
+ # Perform correlation test
+result_mass <- cor.test(OD_sheet$standard_mass, OD_sheet$mass_post_resp_g)
+                            
+ # Print the result
+ print(result_mass)
+ # Pearson's product-moment correlation
+# 
+# data:  OD_sheet$standard_mass and OD_sheet$mass_post_resp_g
+# t = 87.914, df = 64, p-value < 2.2e-16
+# alternative hypothesis: true correlation is not equal to 0
+ # 95 percent confidence interval:
+#  0.9932662 0.9974869
+# sample estimates:
+#       cor 
+ # 0.9958852 
                             
 #### linear models per lake ####
 library(dplyr)
@@ -2894,34 +2888,34 @@ models <- OD_sheet %>%
       nest() %>%
 mutate(model = map(data, ~ lm(mass_post_resp_g ~ fork_length, data = .x)))
 # Extract detailed model summaries
-                            model_summaries <- models %>%
-                              mutate(tidy_summary = map(model, tidy),
+    model_summaries <- models %>%
+   mutate(tidy_summary = map(model, tidy),
                                      glance_summary = map(model, glance)) %>%
-                              select(lake, tidy_summary, glance_summary) %>%
-                              unnest(c(tidy_summary, glance_summary), names_sep = "_")
+ select(lake, tidy_summary, glance_summary) %>%
+ unnest(c(tidy_summary, glance_summary), names_sep = "_")
                             
-                            # Print model summaries
-                            print(model_summaries)
-                            # A tibble: 8 × 18
-                            # Groups:   lake [4]
-                            # lake    tidy_summary_term tidy_summary_estimate tidy_summary_std.error
-                            # <fct>   <chr>                             <dbl>                  <dbl>
-                            #   1 Opeongo (Intercept)                    -3411.                  353.   
-                            # 2 Opeongo fork_length                        9.80                  0.662
-                            # 3 LOTR    (Intercept)                     -401.                  348.   
-                            # 4 LOTR    fork_length                        2.72                  0.862
-                            # 5 Shirley (Intercept)                    -1293.                  116.   
-                            # 6 Shirley fork_length                        4.94                  0.302
-                            # 7 Hogan   (Intercept)                    -3448.                  344.   
-                            # 8 Hogan   fork_length                        9.65                  0.615
+ # Print model summaries
+ print(model_summaries)
+ # A tibble: 8 × 18
+ # Groups:   lake [4]
+# lake    tidy_summary_term tidy_summary_estimate tidy_summary_std.error
+ # <fct>   <chr>                             <dbl>                  <dbl>
+ #   1 Opeongo (Intercept)                    -3411.                  353.   
+# 2 Opeongo fork_length                        9.80                  0.662
+# 3 LOTR    (Intercept)                     -401.                  348.   
+# 4 LOTR    fork_length                        2.72                  0.862
+ # 5 Shirley (Intercept)                    -1293.                  116.   
+ # 6 Shirley fork_length                        4.94                  0.302
+# 7 Hogan   (Intercept)                    -3448.                  344.   
+# 8 Hogan   fork_length                        9.65                  0.615
                             
-                            # ℹ 14 more variables: tidy_summary_statistic <dbl>, tidy_summary_p.value <dbl>,
-                            #   glance_summary_r.squared <dbl>, glance_summary_adj.r.squared <dbl>,
-                            #   glance_summary_sigma <dbl>, glance_summary_statistic <dbl>,
-                            #   glance_summary_p.value <dbl>, glance_summary_df <dbl>,
-                            #   glance_summary_logLik <dbl>, glance_summary_AIC <dbl>,
-                            #   glance_summary_BIC <dbl>, glance_summary_deviance <dbl>,
-                            #   glance_summary_df.residual <int>, glance_summary_nobs <int>
+ # ℹ 14 more variables: tidy_summary_statistic <dbl>, tidy_summary_p.value <dbl>,
+#   glance_summary_r.squared <dbl>, glance_summary_adj.r.squared <dbl>,
+ #   glance_summary_sigma <dbl>, glance_summary_statistic <dbl>,
+#   glance_summary_p.value <dbl>, glance_summary_df <dbl>,
+#   glance_summary_logLik <dbl>, glance_summary_AIC <dbl>,
+ #   glance_summary_BIC <dbl>, glance_summary_deviance <dbl>,
+#   glance_summary_df.residual <int>, glance_summary_nobs <int>
                             
                             
                             
@@ -3124,42 +3118,41 @@ library(ggpmisc)
 ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart)) + 
 geom_point() +  # Adds points to the line graph
 geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
-                              stat_poly_eq(aes(label = ..eq.label..), 
+ stat_poly_eq(aes(label = ..eq.label..), 
                                            formula = y ~ x, 
                                            parse = TRUE) +  # Adds the formula to the graph
                               theme_classic() +
-                              labs(x = "Age", y = "Optical Density of Lipofuscin's Heart")
+labs(x = "Age", y = "Optical Density of Lipofuscin's Heart")
                             
                             
-                            # Create the line graph with regression lines and add the formula and p-value
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart)) + 
-                              geom_point() +  # Adds points to the line graph
-                              geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
-                              stat_poly_eq(aes(label = paste(..eq.label.., ..p.value.label.., sep = "~~~")), 
+# Create the line graph with regression lines and add the formula and p-value
+ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart)) + 
+geom_point() +  # Adds points to the line graph
+geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
+ stat_poly_eq(aes(label = paste(..eq.label.., ..p.value.label.., sep = "~~~")), 
                                            formula = y ~ x, 
                                            parse = TRUE) +  # Adds the formula and p-value to the graph
-                              theme_classic() +
-                              labs(x = "Age", y = "Optical Density of Lipofuscin's Heart")
+theme_classic() +
+labs(x = "Age", y = "Optical Density of Lipofuscin's Heart")
                             
                             
                             
-                            # Create the line graph
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart, 
-                                                                  group = lake, color = lake)) + 
+# Create the line graph
+ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart, 
+                                group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
                               theme_classic() +
                               labs(x = "Age", y = "Optical Density of Heart")
                             
-                            # Create the line graph
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart, 
-                                                                  group = lake, color = lake)) + 
+# Create the line graph
+ ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart, 
+                              group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
                               theme_classic() +
                               labs(x = "Age", y = "Optical Density of Heart")
-                            
-                            # Create the line graph with regression lines
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart, 
-                                                                  group = lake, color = lake)) + 
+ # Create the line graph with regression lines
+  ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart, 
+                                   group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
                               geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
                               theme_classic() +
@@ -3167,7 +3160,7 @@ geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confid
                             
                             
                             
-                            # Create the line graph with regression lines and add the formula and p-value
+# Create the line graph with regression lines and add the formula and p-value
 ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart, group = lake, color = lake)) + 
 geom_point() +  # Adds points to the line graph
 geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
@@ -3192,66 +3185,58 @@ plot <- ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_heart, group = lak
 plot <- plot + geom_text(data = p_values, aes(x = x, y = y, label = paste("p =", round(p_value, 3))), color = "black")
 # Show the plot
 print(plot)
-                            # Show the plot
-                            print(plot)
+
                             
+ # correlation
                             
+ # Perform the correlation test
+correlation_test <- cor.test(OD_sheet$Age, OD_sheet$OD_heart)
                             
-                            # correlation
+# Print the results
+print(correlation_test)
+# Pearson's product-moment correlation
+ # 
+# data:  OD_sheet$Age and OD_sheet$OD_heart
+ # t = -0.25399, df = 59, p-value = 0.8004
+# alternative hypothesis: true correlation is not equal to 0
+ # 95 percent confidence interval:
+ #  -0.2825185  0.2206077
+# sample estimates:
+#       cor 
+ # -0.033049 
+  # Perform the correlation test
+cor.test(OD_sheet$ventricle_mass, OD_sheet$OD_heart)
+# 
+# Pearson's product-moment correlation
+ # 
+# data:  OD_sheet$ventricle and OD_sheet$OD_heart
+ # t = 0.70701, df = 64, p-value = 0.4821
+ # alternative hypothesis: true correlation is not equal to 0
+# 95 percent confidence interval:
+#  -0.1573525  0.3231798
+# sample estimates:
+#        cor 
+# 0.08803299 
                             
-                            # Perform the correlation test
-                            correlation_test <- cor.test(OD_sheet$Age, OD_sheet$OD_heart)
+ # Remove rows with missing values
+OD_sheet_clean <- OD_sheet %>%
+               filter(!is.na(Age) & !is.na(OD_heart))
                             
-                            # Print the results
-                            print(correlation_test)
-                            # Pearson's product-moment correlation
-                            # 
-                            # data:  OD_sheet$Age and OD_sheet$OD_heart
-                            # t = -0.25399, df = 59, p-value = 0.8004
-                            # alternative hypothesis: true correlation is not equal to 0
-                            # 95 percent confidence interval:
-                            #  -0.2825185  0.2206077
-                            # sample estimates:
-                            #       cor 
-                            # -0.033049 
-                            
-                            
-                            
-                            # Perform the correlation test
-                            cor.test(OD_sheet$ventricle_mass, OD_sheet$OD_heart)
-                            # 
-                            # Pearson's product-moment correlation
-                            # 
-                            # data:  OD_sheet$ventricle and OD_sheet$OD_heart
-                            # t = 0.70701, df = 64, p-value = 0.4821
-                            # alternative hypothesis: true correlation is not equal to 0
-                            # 95 percent confidence interval:
-                            #  -0.1573525  0.3231798
-                            # sample estimates:
-                            #        cor 
-                            # 0.08803299 
-                            
-                            
-                            # Remove rows with missing values
-                            OD_sheet_clean <- OD_sheet %>%
-                              filter(!is.na(Age) & !is.na(OD_heart))
-                            
-                            # Calculate correlation and p-values within each lake
-                            results <- OD_sheet %>%
-                              group_by(lake) %>%
-                              summarise(
-                                correlation = cor(Age, OD_heart),
+# Calculate correlation and p-values within each lake
+results <- OD_sheet %>%
+          group_by(lake) %>%
+summarise(
+      correlation = cor(Age, OD_heart),
                                 p_value = cor.test(Age, OD_heart)$p.value
                               )
-                            
-                            print(results)
-                            # A tibble: 4 × 3
-                            # lake    correlation p_value
-                            # <chr>         <dbl>   <dbl>
-                            #   1 Hogan        0.0465   0.859
-                            # 2 LOTR        NA        0.181
-                            # 3 Opeongo     NA        0.745
-                            # 4 Shirley     -0.0137   0.960
+print(results)
+ # A tibble: 4 × 3
+ # lake    correlation p_value
+  # <chr>         <dbl>   <dbl>
+ #   1 Hogan        0.0465   0.859
+# 2 LOTR        NA        0.181
+ # 3 Opeongo     NA        0.745
+# 4 Shirley     -0.0137   0.960
                             
                             
                             
@@ -3810,33 +3795,32 @@ geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confid
                               theme(legend.position = c(0.85, 0.15))  # Positions the legend at the bottom right
                             
                             
-                            # Calculate the regression equations and p-values for each group
+  # Calculate the regression equations and p-values for each group
 library(dplyr)
 library(broom)
                             
-                            # Fit the linear model for each lake and extract coefficients
-                            equation_labels <- OD_sheet %>%
-                              group_by(lake) %>%
-                              do({
-                                model <- lm(OD_liver ~ Age, data = .)
-                                data.frame(
+ # Fit the linear model for each lake and extract coefficients
+ equation_labels <- OD_sheet %>%
+              group_by(lake) %>%
+               do({
+               model <- lm(OD_liver ~ Age, data = .)
+                   data.frame(
                                   lake = unique(.$lake),
                                   intercept = coef(model)[1],
                                   slope = coef(model)[2],
                                   p_value = glance(model)$p.value
                                 )
                               }) %>%
-                              mutate(eq_label = paste0("y = ", round(slope, 2), "x + ", round(intercept, 2)),
+         mutate(eq_label = paste0("y = ", round(slope, 2), "x + ", round(intercept, 2)),
                                      p_value_label = paste0("p = ", format.pval(p_value, digits = 2)))
                             
-                            # Merge the labels with the original data
-                            labels_data <- OD_sheet %>%
-                              inner_join(equation_labels, by = "lake") %>%
-                              group_by(lake) %>%
-                              summarize(x = max(Age), y = min(OD_liver), eq_label = first(eq_label), p_value_label = first(p_value_label))
-                            
-                            # Create the line graph with regression lines and add the formula and p-value
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, group = lake, color = lake)) + 
+ # Merge the labels with the original data
+labels_data <- OD_sheet %>%
+                  inner_join(equation_labels, by = "lake") %>%
+                   group_by(lake) %>%
+                  summarize(x = max(Age), y = min(OD_liver), eq_label = first(eq_label), p_value_label = first(p_value_label))
+ # Create the line graph with regression lines and add the formula and p-value
+ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
                               geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
                               geom_text(data = labels_data, aes(x = x, y = y, label = paste(eq_label, p_value_label, sep = "~~~")),
@@ -3845,12 +3829,12 @@ library(broom)
                               labs(x = "Age", y = "Optical Density of Liver")
                             
                             
-                            # Filter out non-finite and missing values
-                            OD_sheet_filtered <- OD_sheet %>%
+ # Filter out non-finite and missing values
+OD_sheet_filtered <- OD_sheet %>%
                               filter(is.finite(Age), is.finite(OD_liver))
                             
-                            # Fit the linear model for each lake and extract coefficients
-                            equation_labels <- OD_sheet_filtered %>%
+ # Fit the linear model for each lake and extract coefficients
+ equation_labels <- OD_sheet_filtered %>%
                               group_by(lake) %>%
                               do({
                                 model <- lm(OD_liver ~ Age, data = .)
@@ -3864,14 +3848,14 @@ library(broom)
                               mutate(eq_label = paste0("y = ", round(slope, 2), "x + ", round(intercept, 2)),
                                      p_value_label = paste0("p = ", format.pval(p_value, digits = 2)))
                             
-                            # Merge the labels with the original data
-                            labels_data <- OD_sheet_filtered %>%
+ # Merge the labels with the original data
+ labels_data <- OD_sheet_filtered %>%
                               inner_join(equation_labels, by = "lake") %>%
                               group_by(lake) %>%
                               summarize(x = max(Age), y = min(OD_liver), eq_label = first(eq_label), p_value_label = first(p_value_label))
                             
-                            # Create the line graph with regression lines and add the formula and p-value
-                            ggplot(data = OD_sheet_filtered, mapping = aes(x = Age, y = OD_liver, group = lake, color = lake)) + 
+ # Create the line graph with regression lines and add the formula and p-value
+ ggplot(data = OD_sheet_filtered, mapping = aes(x = Age, y = OD_liver, group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
                               geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
                               geom_text(data = labels_data, aes(x = x, y = y, label = paste(eq_label, p_value_label, sep = "~~~")),
@@ -3880,23 +3864,23 @@ library(broom)
                               labs(x = "Age", y = "Optical Density of Liver")
                             
                             
-                            # First, install and load the required packages if you haven't already
-                            install.packages("ggpmisc")
-                            install.packages("ggrepel")
-                            library(ggpmisc)
-                            library(ggrepel)
+ # First, install and load the required packages if you haven't already
+install.packages("ggpmisc")
+install.packages("ggrepel")
+library(ggpmisc)
+library(ggrepel)
                             
-                            # Load necessary packages
-                            library(dplyr)
-                            library(broom)
+# Load necessary packages
+library(dplyr)
+library(broom)
                             
-                            # Filter out non-finite and missing values
-                            OD_sheet_filtered <- OD_sheet %>%
+# Filter out non-finite and missing values
+                             <- OD_sheet %>%
                               filter(is.finite(Age), is.finite(OD_liver))
                             
-                            # Fit the linear model for each lake and extract coefficients
-                            equation_labels <- OD_sheet_filtered %>%
-                              group_by(lake) %>%
+ # Fit the linear model for each lake and extract coefficients
+  equation_labels <- OD_sheet_filtered %>%
+                group_by(lake) %>%
                               do({
                                 model <- lm(OD_liver ~ Age, data = .)
                                 data.frame(
@@ -3906,17 +3890,17 @@ library(broom)
                                   p_value = glance(model)$p.value
                                 )
                               }) %>%
-                              mutate(eq_label = paste0("y = ", round(slope, 2), "x + ", round(intercept, 2)),
+             mutate(eq_label = paste0("y = ", round(slope, 2), "x + ", round(intercept, 2)),
                                      p_value_label = paste0("p = ", format.pval(p_value, digits = 2)))
                             
-                            # Merge the labels with the original data
-                            labels_data <- OD_sheet_filtered %>%
+# Merge the labels with the original data
+ labels_data <- OD_sheet_filtered %>%
                               inner_join(equation_labels, by = "lake") %>%
                               group_by(lake) %>%
                               summarize(x = max(Age), y = min(OD_liver), eq_label = first(eq_label), p_value_label = first(p_value_label))
                             
-                            # Create the line graph with regression lines and add the formula and p-value
-                            ggplot(data = OD_sheet_filtered, mapping = aes(x = Age, y = OD_liver, group = lake, color = lake)) + 
+ # Create the line graph with regression lines and add the formula and p-value
+ ggplot(data = OD_sheet_filtered, mapping = aes(x = Age, y = OD_liver, group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
                               geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
                               geom_label_repel(data = labels_data, aes(x = x, y = y, label = paste(eq_label, p_value_label, sep = "~~~")),
@@ -3924,22 +3908,21 @@ library(broom)
                               theme_classic() +
                               labs(x = "Age", y = "Optical Density of Liver")
                             
-                            # First, install and load the required packages if you haven't already
-                            install.packages("ggpmisc")
-                            install.packages("ggrepel")
-                            library(ggpmisc)
-                            library(ggrepel)
+ # First, install and load the required packages if you haven't already
+ install.packages("ggpmisc")
+ install.packages("ggrepel")
+library(ggpmisc)
+library(ggrepel)
+# Load necessary packages
+library(dplyr)
+library(broom)
                             
-                            # Load necessary packages
-                            library(dplyr)
-                            library(broom)
+# Filter out non-finite and missing values
+ OD_sheet_filtered <- OD_sheet %>%
+             filter(is.finite(Age), is.finite(OD_liver))
                             
-                            # Filter out non-finite and missing values
-                            OD_sheet_filtered <- OD_sheet %>%
-                              filter(is.finite(Age), is.finite(OD_liver))
-                            
-                            # Fit the linear model for each lake and extract coefficients
-                            equation_labels <- OD_sheet_filtered %>%
+ # Fit the linear model for each lake and extract coefficients
+equation_labels <- OD_sheet_filtered %>%
                               group_by(lake) %>%
                               do({
                                 model <- lm(OD_liver ~ Age, data = .)
@@ -3950,17 +3933,17 @@ library(broom)
                                   p_value = glance(model)$p.value
                                 )
                               }) %>%
-                              mutate(eq_label = paste0("y = ", round(slope, 2), "x + ", round(intercept, 2)),
+              mutate(eq_label = paste0("y = ", round(slope, 2), "x + ", round(intercept, 2)),
                                      p_value_label = paste0("p = ", format.pval(p_value, digits = 2)))
                             
-                            # Merge the labels with the original data
-                            labels_data <- OD_sheet_filtered %>%
+ # Merge the labels with the original data
+ labels_data <- OD_sheet_filtered %>%
                               inner_join(equation_labels, by = "lake") %>%
                               group_by(lake) %>%
                               summarize(x = max(Age), y = min(OD_liver), eq_label = first(eq_label), p_value_label = first(p_value_label))
                             
-                            # Create the line graph with regression lines and add the formula and p-value
-                            ggplot(data = OD_sheet_filtered, mapping = aes(x = Age, y = OD_liver, group = lake, color = lake)) + 
+ # Create the line graph with regression lines and add the formula and p-value
+ggplot(data = OD_sheet_filtered, mapping = aes(x = Age, y = OD_liver, group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
                               geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
                               geom_label_repel(data = labels_data, aes(x = x, y = y, label = paste(eq_label, p_value_label, sep = "~~~"), color = lake),
@@ -3969,28 +3952,28 @@ library(broom)
                               labs(x = "Age", y = "Optical Density of Liver")
                             
                             
-                            # Create the line graph with regression lines
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver)) + 
+ # Create the line graph with regression lines
+ ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver)) + 
                               geom_point() +  # Adds points to the line graph
                               geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
                               theme_classic() +
                               labs(x = "Age", y = "Optical Density of Lipofuscin's Liver")
                             
-                            # Create the line graph
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, 
-                                                                  group = lake, color = lake)) + 
+# Create the line graph
+ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, 
+                       group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
                               theme_classic() +
                               labs(x = "Age", y = "Optical Density of Liver")
                             
-                            # Create the line graph
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, 
-                                                                  group = lake, color = lake)) + 
-                              geom_point() +  # Adds points to the line graph
-                              theme_classic() +
-                              labs(x = "Age", y = "Optical Density of Liver")
+# Create the line graph
+ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, 
+                                      group = lake, color = lake)) + 
+geom_point() +  # Adds points to the line graph
+theme_classic() +
+labs(x = "Age", y = "Optical Density of Liver")
                             
-                            # Create the line graph with regression lines
+# Create the line graph with regression lines
                             ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, 
                                                                   group = lake, color = lake)) + 
                               geom_point() +  # Adds points to the line graph
