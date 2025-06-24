@@ -7106,97 +7106,97 @@ print(cor__noout_fl_stmass)
                             # 4 Hogan      0.965     14.3  3.93e-10        15    0.904     0.988 Pearson's pr…
                             # # ℹ 1 more variable: alternative <chr>
                             
-                            #### linear models per lake ####
-                            library(dplyr)
-                            library(purrr)
-                            library(broom)
+ #### linear models per lake ####
+ library(dplyr)
+library(purrr)
+library(broom)
                             
-                            #### standard mass vs fl per separate lake ####
-                            # Fit linear models for each lake
-                            models_no <- OD_sheet_no_outlier %>%
-                              group_by(lake) %>%
-                              nest() %>%
-                              mutate(model = map(data, ~ lm(standard_mass ~ fork_length, data = .x)))
+ #### standard mass vs fl per separate lake ####
+# Fit linear models for each lake
+ models_no <- OD_sheet_no_outlier %>%
+          group_by(lake) %>%
+          nest() %>%
+            mutate(model = map(data, ~ lm(standard_mass ~ fork_length, data = .x)))
                             
-                            # Extract model summaries
-                            model_summaries_no <- models_no %>%
-                              mutate(summary = map(model, glance)) %>%
+  # Extract model summaries
+ model_summaries_no <- models_no %>%
+ mutate(summary = map(model, glance)) %>%
                               unnest(summary)
                             
-                            # Print model summaries
-                            print(model_summaries_no)
-                            # A tibble: 4 × 15
-                            # Groups:   lake [4]
-                            # lake    data     model  r.squared adj.r.squared sigma statistic  p.value    df
-                            # <chr>   <list>   <list>     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>
-                            #   1 Opeongo <tibble> <lm>       0.938         0.934 124.       213. 7.35e-10     1
-                            # 2 LOTR    <tibble> <lm>       0.912         0.906  33.8      145. 8.79e- 9     1
-                            # 3 Shirley <tibble> <lm>       0.956         0.953  35.1      304. 6.88e-11     1
-                            # 4 Hogan   <tibble> <lm>       0.931         0.927 149.       204. 3.93e-10     1
-                            # ℹ 6 more variables: logLik <dbl>, AIC <dbl>, BIC <dbl>, deviance <dbl>,
-                            #   df.residual <int>, nobs <int>
+ # Print model summaries
+print(model_summaries_no)
+ # A tibble: 4 × 15
+ # Groups:   lake [4]
+ # lake    data     model  r.squared adj.r.squared sigma statistic  p.value    df
+# <chr>   <list>   <list>     <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>
+#   1 Opeongo <tibble> <lm>       0.938         0.934 124.       213. 7.35e-10     1
+# 2 LOTR    <tibble> <lm>       0.912         0.906  33.8      145. 8.79e- 9     1
+# 3 Shirley <tibble> <lm>       0.956         0.953  35.1      304. 6.88e-11     1
+# 4 Hogan   <tibble> <lm>       0.931         0.927 149.       204. 3.93e-10     1
+# ℹ 6 more variables: logLik <dbl>, AIC <dbl>, BIC <dbl>, deviance <dbl>,
+#   df.residual <int>, nobs <int>
                             
-                            # Extract detailed model summaries 
-                            model_summaries_no <- models_no %>% mutate(tidy_summary = map(model, tidy), 
+# Extract detailed model summaries 
+ model_summaries_no <- models_no %>% mutate(tidy_summary = map(model, tidy), 
                                                                        glance_summary = map(model, glance)) %>% 
-                              select(lake, tidy_summary, glance_summary) %>% unnest(c(tidy_summary, glance_summary)) 
+select(lake, tidy_summary, glance_summary) %>% unnest(c(tidy_summary, glance_summary)) 
                             # Print model summaries print(model_summaries)
                             # did not work
                             # one more time
                             
-                            # Fit linear models for each lake
-                            models <- OD_sheet %>%
-                              group_by(lake) %>%
-                              nest() %>%
-                              mutate(model = map(data, ~ lm(mass_post_resp_g ~ fork_length, data = .x)))
+ # Fit linear models for each lake
+ models <- OD_sheet %>%
+              group_by(lake) %>%
+              nest() %>%
+              mutate(model = map(data, ~ lm(mass_post_resp_g ~ fork_length, data = .x)))
                             
-                            # Extract detailed model summaries
-                            model_summaries_no <- models_no %>%
+ # Extract detailed model summaries
+model_summaries_no <- models_no %>%
                               mutate(tidy_summary = map(model, tidy),
                                      glance_summary = map(model, glance)) %>%
                               select(lake, tidy_summary, glance_summary) %>%
-                              unnest(c(tidy_summary, glance_summary), names_sep = "_")
+ unnest(c(tidy_summary, glance_summary), names_sep = "_")
                             
-                            # Print model summaries
-                            print(model_summaries_no)
-                            # A tibble: 8 × 18
-                            # Groups:   lake [4]
-                            # lake    tidy_summary_term tidy_summary_estimate tidy_summary_std.error
-                            # <chr>   <chr>                             <dbl>                  <dbl>
-                            #   1 Opeongo (Intercept)                    -3046.                  316.   
-                            # 2 Opeongo fork_length                        8.65                  0.593
-                            # 3 LOTR    (Intercept)                     -825.                  119.   
-                            # 4 LOTR    fork_length                        3.61                  0.299
-                            # 5 Shirley (Intercept)                    -1103.                   93.9  
-                            # 6 Shirley fork_length                        4.26                  0.245
-                            # 7 Hogan   (Intercept)                    -2778.                  311.   
-                            # 8 Hogan   fork_length                        7.93                  0.556
+# Print model summaries
+print(model_summaries_no)
+# A tibble: 8 × 18
+# Groups:   lake [4]
+ # lake    tidy_summary_term tidy_summary_estimate tidy_summary_std.error
+# <chr>   <chr>                             <dbl>                  <dbl>
+#   1 Opeongo (Intercept)                    -3046.                  316.   
+# 2 Opeongo fork_length                        8.65                  0.593
+# 3 LOTR    (Intercept)                     -825.                  119.   
+# 4 LOTR    fork_length                        3.61                  0.299
+# 5 Shirley (Intercept)                    -1103.                   93.9  
+ # 6 Shirley fork_length                        4.26                  0.245
+ # 7 Hogan   (Intercept)                    -2778.                  311.   
+# 8 Hogan   fork_length                        7.93                  0.556
                             
-                            # ℹ 14 more variables: tidy_summary_statistic <dbl>,
-                            #   tidy_summary_p.value <dbl>, glance_summary_r.squared <dbl>,
-                            #   glance_summary_adj.r.squared <dbl>, glance_summary_sigma <dbl>,
-                            #   glance_summary_statistic <dbl>, glance_summary_p.value <dbl>,
-                            #   glance_summary_df <dbl>, glance_summary_logLik <dbl>,
-                            #   glance_summary_AIC <dbl>, glance_summary_BIC <dbl>,
-                            #   glance_summary_deviance <dbl>, glance_summary_df.residual <int>, …
+# ℹ 14 more variables: tidy_summary_statistic <dbl>,
+#   tidy_summary_p.value <dbl>, glance_summary_r.squared <dbl>,
+#   glance_summary_adj.r.squared <dbl>, glance_summary_sigma <dbl>,
+   #   glance_summary_statistic <dbl>, glance_summary_p.value <dbl>,
+    #   glance_summary_df <dbl>, glance_summary_logLik <dbl>,
+   #   glance_summary_AIC <dbl>, glance_summary_BIC <dbl>,
+ #   glance_summary_deviance <dbl>, glance_summary_df.residual <int>, …
                             
-                            #### comparison to 
-                            # Function to perform correlation test
-                            cor_test <- function(df) {
-                              cor.test(df$fork_length, df$standard_mass)
-                            }
+#### comparison to 
+ # Function to perform correlation test
+ cor_test <- function(df) {
+     cor.test(df$fork_length, df$standard_mass)
+                 }
                             
-                            # Apply correlation test to each lake
-                            correlation_results <- OD_sheet %>%
-                              group_by(lake) %>%
-                              nest() %>%
-                              mutate(correlation = map(data, cor_test))
+# Apply correlation test to each lake
+ correlation_results <- OD_sheet %>%
+               group_by(lake) %>%
+              nest() %>%
+              mutate(correlation = map(data, cor_test))
                             
-                            # Extract and print results
-                            correlation_results %>%
-                              mutate(correlation_summary = map(correlation, broom::tidy)) %>%
-                              select(lake, correlation_summary) %>%
-                              unnest(correlation_summary)
+# Extract and print results
+ correlation_results %>%
+              mutate(correlation_summary = map(correlation, broom::tidy)) %>%
+              select(lake, correlation_summary) %>%
+              unnest(correlation_summary)
 #### as relative mass organ stuff ####
                             
 #### Liver relative mass ####
