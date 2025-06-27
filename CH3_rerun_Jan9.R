@@ -39,6 +39,9 @@ library(car)     # for Boot()
 library(dplyr)   # for filter(), mutate()
 library(ggplot2) 
 
+library(dplyr)
+library(purrr)
+library(broom)
 
 SBB_OD1 <- read.csv("C:/Users/user/Desktop/Histological pics/SBB_heart_OD1.csv")
 View(SBB_OD1)
@@ -428,10 +431,6 @@ print(correlation_fl_stmass)
 # 0.9690474 
 
 #### FL vs mass per lake separate ####
-library(dplyr)
-library(purrr)
-library(broom)
-
 
 # Function to perform correlation test
 cor_test <- function(df) {
@@ -723,11 +722,6 @@ alm + geom_text(data = formula, aes(x = Inf, y = Inf, label = formula),
 
 
 #### trying ln for fork length ####
-library(ggplot2)
-library(dplyr)
-library(purrr)
-library(broom)
-
 
 # Fit linear models for each lake and extract formulas
 formulas <- OD_sheet %>%
@@ -1984,7 +1978,7 @@ ggplot(fish_data, aes(x = age, y = fork_length, color = locality)) +
                             
 # another try
                             
-# Example data for fitting (replace with your actual data)
+# Example data for fitting (replace with actual data)
 fish_data <- OD_sheet
                             
 # Initial plotting to understand the data
@@ -2010,7 +2004,7 @@ ggplot(fish_data, aes(x = age, y = fork_length, color = locality)) +
                             
 
                             
-# Scale your data
+# Scale data
 fish_data <- OD_sheet
 fish_data$scaled_age <- scale(fish_data$Age)
 fish_data$scaled_fork_length <- scale(fish_data$fork_length)
@@ -3908,7 +3902,7 @@ library(broom)
                               theme_classic() +
                               labs(x = "Age", y = "Optical Density of Liver")
                             
- # First, install and load the required packages if you haven't already
+ # First, install and load the required packages
  install.packages("ggpmisc")
  install.packages("ggrepel")
 library(ggpmisc)
@@ -3974,43 +3968,41 @@ theme_classic() +
 labs(x = "Age", y = "Optical Density of Liver")
                             
 # Create the line graph with regression lines
-                            ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, 
-                                                                  group = lake, color = lake)) + 
-                              geom_point() +  # Adds points to the line graph
-                              geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
+ggplot(data = OD_sheet, mapping = aes(x = Age, y = OD_liver, 
+                             group = lake, color = lake)) + 
+                             geom_smooth(method = "lm", se = FALSE) +  # Adds regression lines without confidence intervals
                               theme_classic() +
                               labs(x = "Age", y = "Optical Density of Liver")
                             
-                            # Calculate p-values for each lake
-                            p_values3 <- OD_sheet %>%
-                              group_by(lake) %>%
-                              summarise(p_value = cor.test(Age, OD_liver)$p.value)
+# Calculate p-values for each lake
+p_values3 <- OD_sheet %>%
+                       group_by(lake) %>%
+                       summarise(p_value = cor.test(Age, OD_liver)$p.value)
                             
                             
-                            # Create the plot
-                            plot3 <- ggplot(data = OD_sheet, 
-                                            mapping = aes(x = Age, y = OD_liver, 
-                                                          group = lake, color = lake)) + 
+# Create the plot
+ plot3 <- ggplot(data = OD_sheet, 
+             mapping = aes(x = Age, y = OD_liver, 
+                                  group = lake, color = lake)) + 
                               geom_point() + 
                               theme_classic() +
                               labs(x = "Age", y = "Optical Density of Liver")
                             
-                            # Annotate plot with p-values
-                            # Annotate plot with p-values
-                            plot33 <- plot3 + 
-                              geom_text(data = p_values, aes(x = x, y = y, label = paste("p =", round(p_value, 3))), color = "black")
+# Annotate plot with p-values
+                          
+ plot33 <- plot3 + 
+           geom_text(data = p_values, aes(x = x, y = y, label = paste("p =", round(p_value, 3))), color = "black")
                             
-                            # Show the plot
-                            print(plot33)
-                            # Show the plot
-                            print(plot33)
+           # Show the plot
+ print(plot33)
+
                             
-                            # x.lab <- expression("Lakes")
-                            ggplot(data = OD_sheet, mapping = aes(x = lake, y = OD_liver)) + 
+  # x.lab <- expression("Lakes")
+ ggplot(data = OD_sheet, mapping = aes(x = lake, y = OD_liver)) + 
                               geom_boxplot(aes(fill=lake), show.legend = FALSE) +
                               theme_classic()  +
                               labs(x = "Lake", y = "Optical Density of Lipofuscin's Liver")
-                            # labs(x = lake, y = OD_heart)
+ # labs(x = lake, y = OD_heart)
                             
 #### linear models correlation for liver ####
 #### lakes and age for OD liver ####
@@ -4122,8 +4114,8 @@ summary(lm_lvr_age_lakei)
 forest_model(lm_lvr_age_lakei)
 report(lm_lvr_age_lakei)
 # Generate predictions
-                            predictionslm_lvr_age_lakei <- OD_sheet %>%
-                              mutate(predicted_lm_lvr_age_lakei = predict(lm_lvr_age_lakei, newdata = .))
+predictionslm_lvr_age_lakei <- OD_sheet %>%
+        mutate(predicted_lm_lvr_age_lakei = predict(lm_lvr_age_lakei, newdata = .))
                             
 # Create the plot
 ggplot(OD_sheet, aes(x = Age, y = OD_liver, color = lake)) +
@@ -4758,61 +4750,60 @@ report(lm_hrt_lake_age2)
 # Perform the correlation test
 cor.test(OD_sheet$Age, OD_sheet$OD_liver)
                             
-                            # Remove rows with missing values
-                            OD_sheet_clean2 <- OD_sheet %>%
-                              filter(!is.na(Age) & !is.na(OD_liver))
+# Remove rows with missing values
+OD_sheet_clean2 <- OD_sheet %>%
+       filter(!is.na(Age) & !is.na(OD_liver))
                             
-                            # Calculate correlation and p-values within each lake
-                            results2 <- OD_sheet %>%
-                              group_by(lake) %>%
-                              summarise(
-                                correlation = cor(Age, OD_liver),
-                                p_value = cor.test(Age, OD_liver)$p.value
+# Calculate correlation and p-values within each lake
+results2 <- OD_sheet %>%
+          group_by(lake) %>%
+           summarise(
+           correlation = cor(Age, OD_liver),
+          p_value = cor.test(Age, OD_liver)$p.value
                               )
                             
-                            print(results2)
-                            # A tibble: 4 × 3
-                            # lake    correlation p_value
-                            # <chr>         <dbl>   <dbl>
-                            #   1 Hogan            NA   0.110
-                            # 2 LOTR             NA   0.446
-                            # 3 Opeongo          NA   0.194
-                            # 4 Shirley          NA   0.714 
+print(results2)
+# A tibble: 4 × 3
+# lake    correlation p_value
+# <chr>         <dbl>   <dbl>
+#   1 Hogan            NA   0.110
+# 2 LOTR             NA   0.446
+# 3 Opeongo          NA   0.194
+# 4 Shirley          NA   0.714 
                             
-                            # linear model
-                            lm_lvr_lakes <- lm(OD_liver ~ lake, data = OD_sheet)
-                            summary(lm_lvr_lakes)
-                            # Call:
-                            #   lm(formula = OD_liver ~ lake, data = OD_sheet)
-                            # 
-                            # Residuals:
-                            #   Min       1Q   Median       3Q      Max 
-                            # -0.49392 -0.05015  0.01450  0.09908  0.24536 
-                            # 
-                            # Coefficients:
-                            #   Estimate Std. Error t value Pr(>|t|)    
-                            # (Intercept)  0.93065    0.04304  21.623   <2e-16 ***
-                            #   lakeLOTR     0.01585    0.06212   0.255    0.800    
-                            # lakeOpeongo -0.02802    0.06357  -0.441    0.662    
-                            # lakeShirley -0.03673    0.06087  -0.603    0.549    
-                            # ---
-                            #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-                            # 
-                            # Residual standard error: 0.1552 on 45 degrees of freedom
-                            # (17 observations deleted due to missingness)
-                            # Multiple R-squared:  0.01985,	Adjusted R-squared:  -0.04549 
-                            # F-statistic: 0.3038 on 3 and 45 DF,  p-value: 0.8225
+# linear model
+lm_lvr_lakes <- lm(OD_liver ~ lake, data = OD_sheet)
+summary(lm_lvr_lakes)
+# Call:
+#   lm(formula = OD_liver ~ lake, data = OD_sheet)
+# 
+# Residuals:
+#   Min       1Q   Median       3Q      Max 
+# -0.49392 -0.05015  0.01450  0.09908  0.24536 
+# 
+# Coefficients:
+#   Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.93065    0.04304  21.623   <2e-16 ***
+#   lakeLOTR     0.01585    0.06212   0.255    0.800    
+# lakeOpeongo -0.02802    0.06357  -0.441    0.662    
+# lakeShirley -0.03673    0.06087  -0.603    0.549    
+   # ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.1552 on 45 degrees of freedom
+# (17 observations deleted due to missingness)
+ # Multiple R-squared:  0.01985,	Adjusted R-squared:  -0.04549 
+# F-statistic: 0.3038 on 3 and 45 DF,  p-value: 0.8225
                             
-                            # linear model
-                            lm_lvr_lakes_age <- lm(OD_liver ~ lake + Age, data = OD_sheet)
-                            summary(lm_lvr_lakes_age)
-                            
-                            # Call:
-                            #   lm(formula = OD_liver ~ lake + Age, data = OD_sheet)
-                            # 
-                            # Residuals:
-                            #   Min       1Q   Median       3Q      Max 
-                            # -0.48753 -0.05328  0.01335  0.10597  0.22347 
+# linear model
+lm_lvr_lakes_age <- lm(OD_liver ~ lake + Age, data = OD_sheet)
+     summary(lm_lvr_lakes_age)
+# Call:
+#   lm(formula = OD_liver ~ lake + Age, data = OD_sheet)
+# 
+# Residuals:
+#   Min       1Q   Median       3Q      Max 
+# -0.48753 -0.05328  0.01335  0.10597  0.22347 
                             # 
                             # Coefficients:
                             #   Estimate Std. Error t value Pr(>|t|)    
@@ -6902,105 +6893,105 @@ livermassanc <- lm(liver_mass ~ standard_mass + lake, data=OD_sheet)
                               kable("html", caption = "Linear Regression Results") %>%
                               kable_styling(full_width = FALSE)
                             
-                            #### correlation organ vs mass per lake separate ####
-                            library(dplyr)
-                            library(purrr)
-                            library(broom)
+ #### correlation organ vs mass per lake separate ####
+library(dplyr)
+library(purrr)
+library(broom)
                             
-                            # liver
-                            # Function to perform correlation test
-                            cor_test1 <- function(OD_sheet) {
-                              cor.test(OD_sheet$liver_mass, OD_sheet$standard_mass)
+ # liver
+# Function to perform correlation test
+cor_test1 <- function(OD_sheet) {
+        cor.test(OD_sheet$liver_mass, OD_sheet$standard_mass)
                             }
                             
-                            # Apply correlation test to each lake
-                            correlation_results1 <- OD_sheet %>%
-                              group_by(lake) %>%
-                              nest() %>%
-                              mutate(correlation = map(data, cor_test1))
+# Apply correlation test to each lake
+correlation_results1 <- OD_sheet %>%
+           group_by(lake) %>%
+           nest() %>%
+           mutate(correlation = map(data, cor_test1))
                             
-                            # Extract and print results
-                            correlation_results1 %>%
-                              mutate(correlation_summary = map(correlation, broom::tidy)) %>%
-                              select(lake, correlation_summary) %>%
-                              unnest(correlation_summary)
-                            # A tibble: 4 × 9
-                            # Groups:   lake [4]
-                            # lake    estimate statistic   p.value parameter conf.low conf.high method alternative
-                            # <chr>      <dbl>     <dbl>     <dbl>     <int>    <dbl>     <dbl> <chr>  <chr>      
-                            #   1 Opeongo    0.578      2.65 0.0191           14    0.115     0.834 Pears… two.sided  
-                            # 2 LOTR       0.809      5.33 0.0000843        15    0.537     0.929 Pears… two.sided  
-                            # 3 Shirley    0.814      5.24 0.000125         14    0.533     0.933 Pears… two.sided  
-                            # 4 Hogan      0.822      5.60 0.0000511        15    0.565     0.934 Pears… two.sided  
+# Extract and print results
+correlation_results1 %>%
+          mutate(correlation_summary = map(correlation, broom::tidy)) %>%
+          select(lake, correlation_summary) %>%
+          unnest(correlation_summary)
+# A tibble: 4 × 9
+# Groups:   lake [4]
+# lake    estimate statistic   p.value parameter conf.low conf.high method alternative
+# <chr>      <dbl>     <dbl>     <dbl>     <int>    <dbl>     <dbl> <chr>  <chr>      
+#   1 Opeongo    0.578      2.65 0.0191           14    0.115     0.834 Pears… two.sided  
+# 2 LOTR       0.809      5.33 0.0000843        15    0.537     0.929 Pears… two.sided  
+# 3 Shirley    0.814      5.24 0.000125         14    0.533     0.933 Pears… two.sided  
+# 4 Hogan      0.822      5.60 0.0000511        15    0.565     0.934 Pears… two.sided  
                             
                             
-                            # ventricle
-                            # Function to perform correlation test
-                            cor_test2 <- function(OD_sheet) {
-                              cor.test(OD_sheet$ventricle_mass, OD_sheet$standard_mass)
+# ventricle
+# Function to perform correlation test
+cor_test2 <- function(OD_sheet) {
+           cor.test(OD_sheet$ventricle_mass, OD_sheet$standard_mass)
                             }
                             
-                            # Apply correlation test to each lake
-                            correlation_results2 <- OD_sheet %>%
-                              group_by(lake) %>%
-                              nest() %>%
-                              mutate(correlation = map(data, cor_test2))
+# Apply correlation test to each lake
+ correlation_results2 <- OD_sheet %>%
+            group_by(lake) %>%
+            nest() %>%
+            mutate(correlation = map(data, cor_test2))
                             
-                            # Extract and print results
-                            correlation_results2 %>%
-                              mutate(correlation_summary = map(correlation, broom::tidy)) %>%
-                              select(lake, correlation_summary) %>%
-                              unnest(correlation_summary)
-                            # A tibble: 4 × 9
-                            # Groups:   lake [4]
-                            # lake    estimate statistic   p.value parameter conf.low conf.high method alternative
-                            # <chr>      <dbl>     <dbl>     <dbl>     <int>    <dbl>     <dbl> <chr>  <chr>      
-                            #   1 Opeongo    0.954     11.8    1.11e-8        14    0.868     0.984 Pears… two.sided  
-                            # 2 LOTR       0.799      5.15   1.18e-4        15    0.518     0.925 Pears… two.sided  
-                            # 3 Shirley    0.960     12.9    3.69e-9        14    0.887     0.986 Pears… two.sided  
-                            # 4 Hogan      0.955     12.4    2.64e-9        15    0.876     0.984 Pears… two.sided  
+ # Extract and print results
+correlation_results2 %>%
+             mutate(correlation_summary = map(correlation, broom::tidy)) %>%
+             select(lake, correlation_summary) %>%
+             unnest(correlation_summary)
+# A tibble: 4 × 9
+# Groups:   lake [4]
+# lake    estimate statistic   p.value parameter conf.low conf.high method alternative
+# <chr>      <dbl>     <dbl>     <dbl>     <int>    <dbl>     <dbl> <chr>  <chr>      
+#   1 Opeongo    0.954     11.8    1.11e-8        14    0.868     0.984 Pears… two.sided  
+# 2 LOTR       0.799      5.15   1.18e-4        15    0.518     0.925 Pears… two.sided  
+ # 3 Shirley    0.960     12.9    3.69e-9        14    0.887     0.986 Pears… two.sided  
+# 4 Hogan      0.955     12.4    2.64e-9        15    0.876     0.984 Pears… two.sided  
                             
                             
                             
-                            # gonad
-                            # Function to perform correlation test
-                            cor_test3 <- function(OD_sheet) {
-                              cor.test(OD_sheet$gonad_mass, OD_sheet$standard_mass)
+# gonad
+# Function to perform correlation test
+cor_test3 <- function(OD_sheet) {
+          cor.test(OD_sheet$gonad_mass, OD_sheet$standard_mass)
                             }
                             
-                            # Apply correlation test to each lake
-                            correlation_results3 <- OD_sheet %>%
+# Apply correlation test to each lake
+correlation_results3 <- OD_sheet %>%
                               group_by(lake) %>%
                               nest() %>%
                               mutate(correlation = map(data, cor_test3))
                             
-                            # Extract and print results
-                            correlation_results3 %>%
-                              mutate(correlation_summary = map(correlation, broom::tidy)) %>%
-                              select(lake, correlation_summary) %>%
-                              unnest(correlation_summary)
-                            A tibble: 4 × 9
-                            # Groups:   lake [4]
-                            # lake    estimate statistic p.value parameter conf.low conf.high method   alternative
-                            # <chr>      <dbl>     <dbl>   <dbl>     <int>    <dbl>     <dbl> <chr>    <chr>      
-                            #   1 Opeongo    0.276      1.07 0.301          14   -0.255     0.679 Pearson… two.sided  
-                            # 2 LOTR       0.668      3.48 0.00337        15    0.276     0.870 Pearson… two.sided  
-                            # 3 Shirley    0.341      1.36 0.196          14   -0.186     0.716 Pearson… two.sided  
-                            # 4 Hogan      0.564      2.64 0.0184         15    0.114     0.822 Pearson… two.sided  
+# Extract and print results
+correlation_results3 %>%
+              mutate(correlation_summary = map(correlation, broom::tidy)) %>%
+              select(lake, correlation_summary) %>%
+              unnest(correlation_summary)
+# A tibble: 4 × 9
+# Groups:   lake [4]
+ # lake    estimate statistic p.value parameter conf.low conf.high method   alternative
+# <chr>      <dbl>     <dbl>   <dbl>     <int>    <dbl>     <dbl> <chr>    <chr>      
+#   1 Opeongo    0.276      1.07 0.301          14   -0.255     0.679 Pearson… two.sided  
+# 2 LOTR       0.668      3.48 0.00337        15    0.276     0.870 Pearson… two.sided  
+# 3 Shirley    0.341      1.36 0.196          14   -0.186     0.716 Pearson… two.sided  
+# 4 Hogan      0.564      2.64 0.0184         15    0.114     0.822 Pearson… two.sided  
                             
                             
-                            #### differently weighted linear model ####
-                            # Define weights (for illustration, you might have your own logic for weighting)
+#### differently weighted linear model ####
+# Define weights (for illustration, you might have your own logic for weighting)
                             OD_sheet$weights <- c(1, 1.5, 2, 2.5, 3, 2, 1.5, 1)
                             
-                            # Fit weighted linear models for each lake
-                            formulas_weighted <- OD_sheet %>%
+ # Fit weighted linear models for each lake
+ formulas_weighted <- OD_sheet %>%
                               group_by(lake) %>%
                               do(model = lm(fork_length ~ log(Age), data = ., weights = weights)) %>%
                               mutate(formula = paste0("fork_length = ", round(coef(model)[1], 2), " + ", round(coef(model)[2], 2), " * log(Age)"))
                             
-                            # Create the base plot with weights
-                            lalm_weighted <- ggplot(OD_sheet, aes(x = log(Age), y = fork_length, color = lake)) + 
+# Create the base plot with weights
+lalm_weighted <- ggplot(OD_sheet, aes(x = log(Age), y = fork_length, color = lake)) + 
                               geom_point(aes(size = weights), alpha = 0.7) +  # Adjust point size based on weights
                               geom_smooth(method = "lm", aes(weight = weights), se = FALSE) +  # Weighted regression line
                               facet_wrap(~ lake) +  # Create separate panels for each lake
@@ -7010,22 +7001,22 @@ livermassanc <- lm(liver_mass ~ standard_mass + lake, data=OD_sheet)
                                    y = "Fork Length (mm)",
                                    color = "Lake")
                             
-                            # Add weighted formulas to each facet
-                            lalm_weighted + geom_text(data = formulas_weighted, aes(x = Inf, y = Inf, label = formula), 
+# Add weighted formulas to each facet
+lalm_weighted + geom_text(data = formulas_weighted, aes(x = Inf, y = Inf, label = formula), 
                                                       hjust = 1.1, vjust = 2, size = 3, color = "black")
                             
 #### liver vs mass differently weighted linear model ####
-                            # Define weights (for illustration, you might have your own logic for weighting)
-                            OD_sheet$weights <- c(1, 1.5, 2, 2.5, 3, 2, 1.5, 1)
+# Define weights (for illustration, you might have your own logic for weighting)
+OD_sheet$weights <- c(1, 1.5, 2, 2.5, 3, 2, 1.5, 1)
                             
-                            # Fit weighted linear models for each lake
-                            formulas_weighted <- OD_sheet %>%
+# Fit weighted linear models for each lake
+formulas_weighted <- OD_sheet %>%
                               group_by(lake) %>%
                               do(model = lm(fork_length ~ log(Age), data = ., weights = weights)) %>%
                               mutate(formula = paste0("fork_length = ", round(coef(model)[1], 2), " + ", round(coef(model)[2], 2), " * log(Age)"))
                             
-                            # Create the base plot with weights
-                            lalm_weighted <- ggplot(OD_sheet, aes(x = log(Age), y = fork_length, color = lake)) + 
+# Create the base plot with weights
+lalm_weighted <- ggplot(OD_sheet, aes(x = log(Age), y = fork_length, color = lake)) + 
                               geom_point(aes(size = weights), alpha = 0.7) +  # Adjust point size based on weights
                               geom_smooth(method = "lm", aes(weight = weights), se = FALSE) +  # Weighted regression line
                               facet_wrap(~ lake) +  # Create separate panels for each lake
@@ -7035,28 +7026,28 @@ livermassanc <- lm(liver_mass ~ standard_mass + lake, data=OD_sheet)
                                    y = "Fork Length (mm)",
                                    color = "Lake")
                             
-                            # Add weighted formulas to each facet
-                            lalm_weighted + geom_text(data = formulas_weighted, aes(x = Inf, y = Inf, label = formula), 
-                                                      hjust = 1.1, vjust = 2, size = 3, color = "black")
+# Add weighted formulas to each facet
+lalm_weighted + geom_text(data = formulas_weighted, aes(x = Inf, y = Inf, label = formula), 
+                    hjust = 1.1, vjust = 2, size = 3, color = "black")
                             
                             
-                            #### writing the report ####
-                            #install.packages("quarto")
-                            library(quarto)
+  #### writing the report ####
+ #install.packages("quarto")
+ library(quarto)
                             
                             
 #### Analysis without the outlier ####
 view(OD_sheet)
 # Print the row to confirm the outlier
 print(OD_sheet[25, ])
-                            # lake sample_date     id mass_post_resp_g fork_length total_length
-                            # 25 LOTR   9/13/2018 pol_25              588         485          525
-                            # standard_mass  sex maturity gonad_mass ventricle_mass liver_mass Age
-                            # 25           532 male   mature     16.529          0.475      4.759   6
-                            # OD_heart OD_liver
-                            # 25   1.0065       NA
+ # lake sample_date     id mass_post_resp_g fork_length total_length
+# 25 LOTR   9/13/2018 pol_25              588         485          525
+# standard_mass  sex maturity gonad_mass ventricle_mass liver_mass Age
+# 25           532 male   mature     16.529          0.475      4.759   6
+# OD_heart OD_liver
+# 25   1.0065       NA
                             
-                            # Remove the outlier row (e.g., row 10)
+# Remove the outlier row (e.g., row 10)
 OD_sheet_no_outlier <- OD_sheet[-25, ]
                             
 #### FL vs mass correlation  ####
@@ -7067,44 +7058,44 @@ cor__noout_fl_stmass <- cor.test(OD_sheet_no_outlier$fork_length,
                             
 # Print the test results
 print(cor__noout_fl_stmass)
-                            # Pearson's product-moment correlation
-                            # 
-                            # data:  OD_sheet_no_outlier$fork_length and OD_sheet_no_outlier$standard_mass
-                            # t = 36.694, df = 63, p-value < 2.2e-16
-                            # alternative hypothesis: true correlation is not equal to 0
-                            # 95 percent confidence interval:
-                            #  0.9630807 0.9861985
-                            # sample estimates:
-                            #       cor 
-                            # 0.9773951 
+# Pearson's product-moment correlation
+ # 
+# data:  OD_sheet_no_outlier$fork_length and OD_sheet_no_outlier$standard_mass
+# t = 36.694, df = 63, p-value < 2.2e-16
+# alternative hypothesis: true correlation is not equal to 0
+# 95 percent confidence interval:
+#  0.9630807 0.9861985
+# sample estimates:
+ #       cor 
+# 0.9773951 
                             
-                            # Function to perform correlation test
-                            cor_test <- function(OD_sheet_no_outlier) {
-                              cor.test(OD_sheet_no_outlier$fork_length, 
-                                       OD_sheet_no_outlier$standard_mass)
+# Function to perform correlation test
+ cor_test <- function(OD_sheet_no_outlier) {
+          cor.test(OD_sheet_no_outlier$fork_length, 
+          OD_sheet_no_outlier$standard_mass)
                             }
                             
-                            # Apply correlation test to each lake
-                            correlation_results <- OD_sheet %>%
-                              group_by(lake) %>%
-                              nest() %>%
-                              mutate(correlation = map(data, cor_test))
+# Apply correlation test to each lake
+correlation_results <- OD_sheet %>%
+           group_by(lake) %>%
+           nest() %>%
+           mutate(correlation = map(data, cor_test))
                             
-                            # Extract and print results
-                            correlation_results %>%
-                              mutate(correlation_summary = map(correlation, broom::tidy)) %>%
-                              select(lake, correlation_summary) %>%
-                              unnest(correlation_summary)
+ # Extract and print results
+correlation_results %>%
+           mutate(correlation_summary = map(correlation, broom::tidy)) %>%
+           select(lake, correlation_summary) %>%
+           unnest(correlation_summary)
                             
-                            # A tibble: 4 × 9
-                            # Groups:   lake [4]
-                            # lake    estimate statistic  p.value parameter conf.low conf.high method       
-                            # <chr>      <dbl>     <dbl>    <dbl>     <int>    <dbl>     <dbl> <chr>        
-                            #   1 Opeongo    0.969     14.6  7.35e-10        14    0.910     0.989 Pearson's pr…
-                            # 2 LOTR       0.647      3.29 4.95e- 3        15    0.242     0.860 Pearson's pr…
-                            # 3 Shirley    0.978     17.4  6.88e-11        14    0.935     0.992 Pearson's pr…
-                            # 4 Hogan      0.965     14.3  3.93e-10        15    0.904     0.988 Pearson's pr…
-                            # # ℹ 1 more variable: alternative <chr>
+# A tibble: 4 × 9
+ # Groups:   lake [4]
+# lake    estimate statistic  p.value parameter conf.low conf.high method       
+# <chr>      <dbl>     <dbl>    <dbl>     <int>    <dbl>     <dbl> <chr>        
+ #   1 Opeongo    0.969     14.6  7.35e-10        14    0.910     0.989 Pearson's pr…
+ # 2 LOTR       0.647      3.29 4.95e- 3        15    0.242     0.860 Pearson's pr…
+ # 3 Shirley    0.978     17.4  6.88e-11        14    0.935     0.992 Pearson's pr…
+ # 4 Hogan      0.965     14.3  3.93e-10        15    0.904     0.988 Pearson's pr…
+ # # ℹ 1 more variable: alternative <chr>
                             
  #### linear models per lake ####
  library(dplyr)
